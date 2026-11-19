@@ -60,25 +60,37 @@
         "src": "assets/laboratory-concept-v3.webp",
         "title": "Лабораторная среда",
         "alt": "Концептуальная фотография оптической лаборатории в тёплом вечернем свете",
-        "description": "Оптическая схема, рабочий свет и пространство для эксперимента. Концептуальная визуализация."
+        "description": "Оптическая схема и пространство для эксперимента. Концептуальная визуализация."
     },
     {
         "src": "assets/optical-module-concept-v3.webp",
         "title": "Оптический модуль",
-        "alt": "Концептуальная фотография компактного чёрного оптического модуля на лабораторном столе",
-        "description": "Свет на входе. Сигнал на выходе. Концептуальная визуализация устройства."
+        "alt": "Концептуальная фотография компактного оптического модуля",
+        "description": "Концептуальная визуализация оптического устройства, не фотография серийного продукта Iscrop."
     },
     {
         "src": "assets/signal-board-concept-v3.webp",
         "title": "Электроника сигнала",
-        "alt": "Концептуальная фотография тёмно-синей платы с микросхемами и коаксиальными портами",
-        "description": "Элементы складываются в систему. Концептуальная визуализация устройства."
+        "alt": "Концептуальная фотография электронной платы с микросхемами и коаксиальными портами",
+        "description": "Концептуальная визуализация электронной платы, не фотография серийного продукта Iscrop."
     },
     {
-        "src": "assets/signal-study-v2.svg",
-        "title": "Геометрия сигнала",
-        "alt": "Золотые и сливовые волновые поля",
-        "description": "Ритм, наложение и связь между частями целого. Художественная визуализация."
+        "src": "assets/field-study-v4.svg",
+        "title": "Поле",
+        "alt": "Непрерывные янтарные и сливовые линии переходят в дискретные точки",
+        "description": "От непрерывного поля к измерению. Графическая интерпретация, не схема конкретного устройства."
+    },
+    {
+        "src": "assets/channel-study-v4.svg",
+        "title": "Канал",
+        "alt": "Семь групп янтарных и сливовых трасс проходят через общую область и расходятся",
+        "description": "Связь между частями целого. Графическая интерпретация передачи сигнала."
+    },
+    {
+        "src": "assets/data-study-v4.svg",
+        "title": "Данные",
+        "alt": "Из регулярного поля точек возникает волновой узор",
+        "description": "Дискретная структура для информации. Графическая интерпретация данных."
     }
 ];
   let viewerIndex = 0;
@@ -187,7 +199,7 @@
     else {
       const bounds = manifesto.getBoundingClientRect();
       const fraction = clamp((window.innerHeight * .88 - bounds.top) / (window.innerHeight * .62 + bounds.height * .3));
-      wordElements.forEach((word, index) => { word.style.opacity = String(.24 + .76 * clamp(fraction * (words.length + 3) - index)); });
+      wordElements.forEach((word, index) => { word.style.opacity = String(.5 + .5 * clamp(fraction * (words.length + 3) - index)); });
     }
     if (banner) {
       const bounds = banner.parentElement.getBoundingClientRect();
@@ -206,15 +218,31 @@
     }), { threshold: .12 });
     document.querySelectorAll('.reveal').forEach(element => reveals.observe(element));
   } else document.querySelectorAll('.reveal').forEach(element => element.classList.add('is-visible'));
-  const hero = document.querySelector('.hero');
-  const heroImage = document.querySelector('.hero-image');
-  hero.addEventListener('pointermove', event => {
-    if (quiet || !finePointer.matches || event.pointerType !== 'mouse') return;
-    const rect = hero.getBoundingClientRect();
-    heroImage.style.setProperty('--px', ((event.clientX - rect.left) / rect.width - .5) * 12 + 'px');
-    heroImage.style.setProperty('--py', ((event.clientY - rect.top) / rect.height - .5) * 9 + 'px');
+  const studies = [
+    { src: 'assets/field-study-v4.svg', title: 'Непрерывное становится измеримым.', description: 'Световое поле — начало пути. Измерение позволяет увидеть в нём информацию.', alt: 'Непрерывные янтарные и сливовые линии переходят в дискретные точки' },
+    { src: 'assets/channel-study-v4.svg', title: 'Расстояние становится связью.', description: 'Физический канал соединяет части системы и позволяет передать сигнал дальше.', alt: 'Группы тёплых световых трасс соединяют разные части композиции' },
+    { src: 'assets/data-study-v4.svg', title: 'Сигнал приобретает структуру.', description: 'Дискретные отсчёты становятся материалом для цифровой обработки.', alt: 'Регулярное поле янтарных и сливовых точек образует волновой рисунок' }
+  ];
+  const studyTabs = [...document.querySelectorAll('[data-study]')];
+  function selectStudy(index, focus = false) {
+    const study = studies[index];
+    const image = document.getElementById('hero-study-image');
+    image.src = study.src; image.alt = study.alt;
+    image.closest('picture').querySelector('source').srcset = study.src.replace('-study-v4', '-study-mobile-v4');
+    document.getElementById('hero-study-title').textContent = study.title;
+    document.getElementById('hero-study-description').textContent = study.description;
+    document.getElementById('hero-study-panel').setAttribute('aria-labelledby', studyTabs[index].id);
+    studyTabs.forEach((tab, i) => { tab.setAttribute('aria-selected', String(i === index)); tab.tabIndex = i === index ? 0 : -1; });
+    if (focus) studyTabs[index].focus();
+  }
+  studyTabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => selectStudy(index));
+    tab.addEventListener('keydown', event => {
+      const next = event.key === 'ArrowRight' ? (index + 1) % studies.length : event.key === 'ArrowLeft' ? (index + studies.length - 1) % studies.length : event.key === 'Home' ? 0 : event.key === 'End' ? studies.length - 1 : null;
+      if (next !== null) { event.preventDefault(); selectStudy(next, true); }
+    });
   });
-  hero.addEventListener('pointerleave', () => { heroImage.style.setProperty('--px', '0px'); heroImage.style.setProperty('--py', '0px'); });
+  document.querySelectorAll('[data-direction]').forEach(link => link.addEventListener('click', () => activateTab(Number(link.dataset.direction))));
   document.querySelectorAll('.magnetic').forEach(element => {
     element.addEventListener('pointermove', event => {
       if (quiet || !finePointer.matches || event.pointerType !== 'mouse') return;

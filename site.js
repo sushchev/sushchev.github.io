@@ -57,9 +57,9 @@
 
   const art = [
     {
-        "src": "assets/laboratory-concept-v3.webp",
-        "title": "Лабораторная среда",
-        "alt": "Концептуальная фотография оптической лаборатории в тёплом вечернем свете",
+        "src": "assets/hero-optical-v2.webp",
+        "title": "Оптическая среда",
+        "alt": "Концептуальная визуализация преломления света",
         "description": "Оптическая схема и пространство для эксперимента. Концептуальная визуализация."
     },
     {
@@ -301,6 +301,13 @@
       context.stroke();
     });
     const sum = 2 * Math.abs(Math.cos(phase / 2));
+    const probabilityA = Math.cos(phase / 2) ** 2;
+    const percentages = [Math.round(probabilityA * 100), 100 - Math.round(probabilityA * 100)];
+    ['a','b'].forEach((letter, i) => {
+      document.getElementById('detector-' + letter).style.width = percentages[i] + '%';
+      document.getElementById('detector-' + letter + '-value').textContent = percentages[i] + '%';
+    });
+
     const label = sum < .03 ? 'В этой модели волны полностью гасят друг друга.' : sum > 1.98 ? 'Волны усиливают друг друга.' : sum < 1 ? 'Сумма ослабляется.' : 'Волны складываются с фазовым сдвигом.';
     document.getElementById('phase-value').textContent = degrees + '°';
     document.getElementById('wave-state').textContent = `${label} Амплитуда суммы: ${sum.toFixed(2).replace('.', ',')}.`;
